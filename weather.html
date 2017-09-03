@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>weather</title>
+    <script src="jquery-3.2.1.min.js"></script>
+    <style>
+    html, body{
+      padding: 0;
+      margin: 0;
+    }
+    .container{
+      color: white;
+      position: relative;
+      width: 800px;
+      height: 1000px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      margin: auto;
+    }
+    .info ul{
+      list-style: none;
+      padding: 0;
+    }
+    .info ul li{
+      width: 25%;
+      /*height: 500px;*/
+      background: rgba(0, 0, 0, 0.7);
+      float: left;
+      text-align: center;
+      /*border-left:1px solid white;*/
+    }
+    /*.info ul li:last-child{
+      border-right: 1px solid white;
+    }*/
+    .info ul li div{
+      height: 80px;
+      border-top: 1px solid white;
+      line-height: 80px;
+    }
+    .info ul li div:last-child {
+      border-bottom: 1px solid white;
+    }
+    #currentCity, #pm25, .suggestion_title{
+      font-size: 15px;
+      /*line-height: 18px;*/
+      margin-top: 18px;
+    }
+    .suggestion{
+      padding-left: 20px;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <input type="text" name="location" id="city" value="shenzhen">
+      <input type="button" name="button" value="Get Weather" id="button">
+      <div id="currentCity">City: </div>
+      <div id="pm25">PM2.5 Index: </div>
+      <div class="suggestion_title">Suggestion:</div>
+      <div class="suggestion"></div>
+      <div class="info">
+        <ul>
+          <li id="0">
+            <div class="date"></div>
+            <div class="pic"></div>
+            <div class="temp"></div>
+            <div class="weather"></div>
+            <div class="wind"></div>
+          </li>
+          <li id="1">
+            <div class="date"></div>
+            <div class="pic"></div>
+            <div class="temp"></div>
+            <div class="weather"></div>
+            <div class="wind"></div>
+          </li>
+          <li id="2">
+            <div class="date"></div>
+            <div class="pic"></div>
+            <div class="temp"></div>
+            <div class="weather"></div>
+            <div class="wind"></div>
+          </li>
+          <li id="3">
+            <div class="date"></div>
+            <div class="pic"></div>
+            <div class="temp"></div>
+            <div class="weather"></div>
+            <div class="wind"></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+      $button = $("#button");
+      $button.click(function(){
+        $city = $("#city").val();
+        console.log($city);
+        $.ajax({
+          type: "GET",
+          url: "http://api.map.baidu.com/telematics/v3/weather?location="+$city+"&output=json&ak=ohA7QHfg0BBrpiY4kyuIAAsD",
+          dataType: "jsonp",
+          beforeSend: function(){
+            console.log("Proccessing...");
+          },
+          complete: function(){
+            console.log("Request Complete");
+          },
+          success: function(data){
+            display(data);
+          },
+          error: function(){
+            console.log("error");
+          },
+        });
+      });
+      function display(data){
+        console.log(data);
+
+        if (data.error != 0) {
+          alert("Sorry, either you typed wrongly or we don\'t have the city's informaion.");
+          return;
+        }
+
+
+        $results = data.results[0];
+        $currentCity = $results.currentCity;
+        $('#currentCity').text("City: "+$currentCity);
+        $('#pm25').text("PM2.5 Index: "+$results.pm25);
+        $index = $results.index;
+        $(".suggestion").empty().append("<br/>");
+        for (var i = 0; i < $index.length; i++) {
+          $(".suggestion").append("-"+$index[i].des+"<br/>");
+        }
+
+
+
+
+        $weather_data = $results.weather_data;
+        for (var i = 0; i < $weather_data.length; i++) {
+          $("#"+i).children(".date").text($weather_data[i].date);
+          $("#"+i).children(".pic").empty().append('<img src='+$weather_data[i].dayPictureUrl+'>');
+          $("#"+i).children(".temp").text($weather_data[i].temperature);
+          $("#"+i).children(".weather").text($weather_data[i].weather);
+          $("#"+i).children(".wind").text($weather_data[i].wind);
+          // console.log($lists[i]);
+        }
+
+      };
+    </script>
+    <img src="">
+  </body>
+
+
+
+
+
+
+</html>
